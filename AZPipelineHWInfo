@@ -1,0 +1,62 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      # Write your PowerShell commands here.
+      
+      $CPUInfo = Get-WmiObject Win32_Processor
+                $OSInfo = Get-WmiObject Win32_OperatingSystem  
+                $modelinfo = Get-CimInstance  -ClassName win32_computersystem
+                $moboinfo = Get-WmiObject win32_baseboard
+                $biosinfo = Get-WmiObject win32_bios
+                $InstalledRAM = Get-WmiObject -Class Win32_ComputerSystem
+                $TotalInstalledRAM = [Math]::Round(($InstalledRAM.TotalPhysicalMemory / 1GB))
+                $videoinfo = Get-WmiObject  win32_videocontroller
+                $audioinfo = Get-WmiObject win32_sounddevice
+                $printerinfo = Get-WmiObject win32_printer 2>$null
+             
+                                     
+                Foreach ($CPU in $CPUInfo) {
+
+                    # CPU
+
+                    $infoObject = New-Object PSObject
+                 
+                    Add-Member -inputObject $infoObject -memberType NoteProperty -name "Family"         -value $CPU.Description
+                    Add-Member -inputObject $infoObject -memberType NoteProperty -name "Model"          -value $CPU.Name
+                    Add-Member -inputObject $infoObject -memberType NoteProperty -name "Manufacturer"   -value $CPU.Manufacturer
+                    Add-Member -inputObject $infoObject -memberType NoteProperty -name "Fisical Cores"  -value $CPU.NumberOfCores
+                    Add-Member -inputObject $infoObject -memberType NoteProperty -name "L2 Cache"       -value $CPU.L2CacheSize
+                    Add-Member -inputObject $infoObject -memberType NoteProperty -name "L3 Cache"       -value $CPU.L3CacheSize
+                    Add-Member -inputObject $infoObject -memberType NoteProperty -name "Socket"         -Value $CPU.SocketDesignation
+                    Add-Member -inputObject $infoObject -memberType NoteProperty -name "Logical Processors"  -value $CPU.NumberOfLogicalProcessors
+                }
+                Foreach ($OS in $OSInfo) {
+
+                    # SO
+
+                    $infoObject2 = New-Object PSObject
+                   
+                    Add-Member -inputObject $infoObject2 -memberType NoteProperty -name "Name"             -value $OSInfo.Caption
+                    Add-Member -inputObject $infoObject2 -memberType NoteProperty -name "Build Number"     -value $OSInfo.BuildNumber
+                    Add-Member -inputObject $infoObject2 -memberType NoteProperty -name "Manufacturer"     -value $OSInfo.Manufacturer
+                    Add-Member -inputObject $infoObject2 -memberType NoteProperty -name "Serial Number"    -value $OSInfo.SerialNumber
+                    Add-Member -inputObject $infoObject2 -memberType NoteProperty -name "Status"           -value $OSInfo.Status   
+                }
+                $CPUInfo
+                $OSInfo
