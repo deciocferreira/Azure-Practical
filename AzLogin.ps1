@@ -14,5 +14,26 @@ az login
 az group create --name <name> --location <location>
 
 #Criar uma Network
+vnetName=Labnet01
+subnetName=LabnetSubnet1
+vnetAddressPrefix=10.0.0.0/16
+subnetAddressPrefix=10.0.0.0/24
+
+az network vnet create \
+  --name $vnetName \
+  --resource-group $resourceGroup \
+  --address-prefixes $vnetAddressPrefix \
+  --subnet-name $subnetName \
+  --subnet-prefixes $subnetAddressPrefix
 
 #Criar uma VM
+# create shell variables
+az vm create \
+  --resource-group $resourceGroup \
+  --name $vmName \
+  --image UbuntuLTS \
+  --vnet-name $vnetName \
+  --subnet $subnetName \
+  --generate-ssh-keys \
+  --output json \
+  --verbose
